@@ -1,17 +1,20 @@
 import React, { Component } from 'react'
 import { Navbar, Nav, Button, Form } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
+import { Link } from 'react-router-dom';
 class NavbarDC extends Component {
     render() {
         return (
             <Navbar bg="dark" variant="dark">
-                <Navbar.Brand href="#home">DC Blockchain</Navbar.Brand>
+                <Link to="/" className="navbar-brand">DC Blockchain</Link>
                 <Nav className="mr-auto">
-                    <Nav.Link href="#home">Home</Nav.Link>
+                    <Link to="/" className="navbar-brand">Home</Link>
                 </Nav>
                 <Form inline>
-                    <Button variant="outline-info">Create Account</Button>
+                    <Button variant="outline-info">
+                        <Link to="/registerKeys" >Create Account</Link>
+                    </Button>
+
                 </Form>
             </Navbar>
         )

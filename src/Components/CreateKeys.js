@@ -3,9 +3,8 @@ import React, { Component } from 'react'
 import { Button } from 'react-bootstrap';
 import Alert from 'react-bootstrap/Alert'
 import User from './class';
-import Login from './Login';
-
-
+import './CreateKeys.css';
+import { Link } from 'react-router-dom';
 class CreateKeys extends Component {
 
     constructor(props) {
@@ -17,7 +16,7 @@ class CreateKeys extends Component {
             showAlert: false,
             variant: "warning",
             userData: [],
-            id: 0,
+            id: "",
 
         }
         this.user = User;
@@ -51,7 +50,7 @@ class CreateKeys extends Component {
 
         let userId = this.state.id + 1;
         const user = new User(this.state.id, this.state.publicKey,
-            this.state.privateKey);
+            this.state.privateKey, this.state.transactions = []);
 
         const newUser = [...this.state.userData, user];
         this.setState({
@@ -64,12 +63,7 @@ class CreateKeys extends Component {
     render() {
 
         return (
-            <div>
-                <Button variant="outline-info"
-                    onClick={this.generateKeys}
-                    disabled={this.state.showButton}>
-                    Generate Wallet
-                </Button>
+            <div className="keys">
                 <Alert variant={this.state.variant} show={this.state.showAlert}>
                     Your public and private Key are unique. Make sure to store it safely.<br />
                 If you are losing one of them, you will never be able to access your account again!!!.
@@ -82,8 +76,9 @@ class CreateKeys extends Component {
                     disabled={this.state.showButton}>
                     Generate Wallet
                 </Button>
-                <Login pubKey={this.state.publicKey} privKey={this.state.privateKey}
-                    userData={this.state.userData} />
+                <Button variant="outline-info">
+                    <Link to="/login" >Return to login</Link>
+                </Button>
             </div>
         )
     }

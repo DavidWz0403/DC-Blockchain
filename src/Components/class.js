@@ -1,10 +1,13 @@
 class User {
-    constructor(id, pubKey, privKey) {
+    constructor(id, pubKey, privKey, transaction) {
         this.id = id;
         this.pubKey = pubKey;
         this.privKey = privKey;
+        this.transaction = [];
 
     }
 }
 
-export default User; 
+
+
+export default User;
