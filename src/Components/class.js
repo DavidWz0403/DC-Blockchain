@@ -3,7 +3,7 @@ class User {
         this.id = id;
         this.pubKey = pubKey;
         this.privKey = privKey;
-        this.transaction = [];
+
 
     }
 }

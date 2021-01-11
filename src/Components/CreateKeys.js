@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
-// import { EC } from 'elliptic';
 import { Button } from 'react-bootstrap';
 import Alert from 'react-bootstrap/Alert'
 import User from './class';
+import BlockchainAPI from './BlockchainAPI';
+import axios from 'axios';
 import './CreateKeys.css';
 import { Link } from 'react-router-dom';
 class CreateKeys extends Component {
@@ -15,50 +16,66 @@ class CreateKeys extends Component {
             showButton: false,
             showAlert: false,
             variant: "warning",
-            userData: [],
-            id: "",
+            balance: 100,
 
         }
         this.user = User;
+        this.api = BlockchainAPI;
     }
 
 
-    generateKeys = () => {
+    generateKeys = async () => {
 
         const EC = require('elliptic').ec;
         const ec = new EC('secp256k1');
         const key = ec.genKeyPair();
-        setTimeout(() => {
+        setTimeout(async () => {
             this.setState({
                 publicKey: key.getPublic('hex'),
                 privateKey: key.getPrivate('hex'),
+                showButton: true,
             })
 
-            this.generateUser();
+            const user = {
+                publicKey: this.state.publicKey,
+                privateKey: this.state.privateKey,
+                balance: this.state.balance
+            }
+
+            try {
+                const response = await axios.post('http://localhost:4000/users/add', user);
+                console.log(response.data);
+            } catch (err) {
+                console.log('Error: ' + err)
+            }
         }, 100)
 
-        console.log("privKey")
-        console.log(this.state.privateKey);
-        console.log("pub key")
-        console.log(this.state.publicKey);
+
+
+        // this.postUserData(user);
 
         //Post method
 
     }
 
+    postUserData = async (user) => {
+        try {
+            const response = await axios.post(`http:localhost:4000/users/add`, user);
+            console.log(response.data);
+        } catch (err) {
+            console.log('Error: ' + err)
+        }
+    }
+
     generateUser = () => {
+        const user = {
+            publicKey: this.state.publicKey,
+            privateKey: this.state.privateKey,
+            balance: this.state.balance
+        }
 
-        let userId = this.state.id + 1;
-        const user = new User(this.state.id, this.state.publicKey,
-            this.state.privateKey, this.state.transactions = []);
+        return this.state.user;
 
-        const newUser = [...this.state.userData, user];
-        this.setState({
-            userData: newUser,
-            showAlert: true,
-            id: userId,
-        })
-        console.log(this.state.userData)
     }
     render() {
 
@@ -68,7 +85,6 @@ class CreateKeys extends Component {
                     Your public and private Key are unique. Make sure to store it safely.<br />
                 If you are losing one of them, you will never be able to access your account again!!!.
                 </Alert>
-                <p>Your id: {this.state.id}</p>
                 <p>Your public key: {this.state.publicKey}</p>
                 <p>Your private key: {this.state.privateKey}</p>
                 <Button variant="outline-info"
