@@ -3,6 +3,7 @@ import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import Alert from 'react-bootstrap/Alert'
 import { Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import axios from 'axios';
 
 class Login extends Component {
@@ -14,13 +15,13 @@ class Login extends Component {
             privInput: "",
             showSuccess: false,
             variant: "success",
-            text: ''
-
+            text: '',
+            value: false,
+            to: "/:id",
+            id: "",
+            balance: 0
         }
 
-        const publicKey = this.props.pubKey;
-        const privateKey = this.props.privKey;
-        const userData = this.props.userData;
     }
 
 
@@ -37,8 +38,6 @@ class Login extends Component {
             privInput: input
         })
     }
-
-
     authentication = async () => {
 
         // get users from the api
@@ -49,10 +48,21 @@ class Login extends Component {
             user.map(user => {
                 if (user.publicKey === this.state.pubInput &&
                     user.privateKey === this.state.privInput) {
-                    console.log('it works');
-                    return <Link to="/account" />
+                    this.setState({
+                        value: true,
+                        to: `/account`,
+                        balance: user.balance
+                    })
                 }
+
+
             })
+
+            if (this.state.value = false) {
+                this.setState({
+                    to: "/empty"
+                })
+            }
         } catch (err) {
             console.log('Error: ' + err)
         }
@@ -60,7 +70,10 @@ class Login extends Component {
 
 
     }
+
+
     render() {
+
         return (
             <div>
                 <Alert variant={this.state.variant} show={this.state.showSuccess}>
@@ -82,7 +95,8 @@ class Login extends Component {
                             Place your message here, <strong>won't be shared with any third parties!</strong>
                         </Form.Text>
                     </Form.Group>
-                    <Button onClick={this.authentication}>Log in</Button>
+                    <Button onClick={this.authentication}>
+                        <Link to={this.state.to} value={false} userbalance={this.state.balance}>Log in</Link></Button>
                 </Form>
             </div>
         )

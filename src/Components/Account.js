@@ -9,7 +9,7 @@ class Account extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            balance: 100,
+            balance: this.props.userbalance,
             toAddressInput: "",
             amount: 0,
             fromAddressInput: "",//should be fetched from API
@@ -21,6 +21,10 @@ class Account extends Component {
             text: ""
         }
         this.transaction = Transaction;
+    }
+
+    componentDidMount = async () => {
+
     }
 
     setAddressInput = (e) => {
