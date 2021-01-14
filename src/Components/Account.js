@@ -3,13 +3,15 @@ import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import Alert from 'react-bootstrap/Alert'
 import Transaction from './transaction_class';
-
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import * as actions from '../actions/app.action';
 
 class Account extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            balance: this.props.userbalance,
+            balance: this.props.applicationState.user.balance,
             toAddressInput: "",
             amount: 0,
             fromAddressInput: "",//should be fetched from API
@@ -85,7 +87,7 @@ class Account extends Component {
                 <Form>
                     <Form.Group controlId="email">
                         <Form.Label>From address:<span>*</span></Form.Label>
-                        <Form.Control value={this.state.fromAddressInput}
+                        <Form.Control placeholder={this.props.applicationState.user.publicKey} value={this.state.fromAddressInput}
                             onChange={this.setFromAddressInput} type="text" required />
                         <Form.Text className="text-muted">
                             Thos is your wallet address <strong>You cannot change it, because you can only spend your own coins</strong>
@@ -114,4 +116,6 @@ class Account extends Component {
     }
 }
 
-export default Account; 
+const mapStateToProps = state => ({ applicationState: state });
+const mapDispatchToProps = dispatch => ({ actions: bindActionCreators(actions, dispatch) });
+export default connect(mapStateToProps, mapDispatchToProps)(Account);

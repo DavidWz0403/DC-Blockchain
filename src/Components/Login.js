@@ -5,6 +5,9 @@ import Alert from 'react-bootstrap/Alert'
 import { Link } from 'react-router-dom';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import axios from 'axios';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import * as actions from '../actions/app.action';
 
 class Login extends Component {
 
@@ -17,7 +20,7 @@ class Login extends Component {
             variant: "success",
             text: '',
             value: false,
-            to: "/:id",
+            to: "/account",
             id: "",
             balance: 0
         }
@@ -41,6 +44,7 @@ class Login extends Component {
     authentication = async () => {
 
         // get users from the api
+
         try {
             const response = await axios.get(`http://localhost:4000/users`);
             const user = response.data;
@@ -48,11 +52,15 @@ class Login extends Component {
             user.map(user => {
                 if (user.publicKey === this.state.pubInput &&
                     user.privateKey === this.state.privInput) {
+                    const currentUser = user;
+                    this.props.actions.storeUserData(currentUser)
+
                     this.setState({
                         value: true,
                         to: `/account`,
-                        balance: user.balance
+
                     })
+
                 }
 
 
@@ -67,7 +75,7 @@ class Login extends Component {
             console.log('Error: ' + err)
         }
 
-
+        console.log('hello world')
 
     }
 
@@ -96,11 +104,12 @@ class Login extends Component {
                         </Form.Text>
                     </Form.Group>
                     <Button onClick={this.authentication}>
-                        <Link to={this.state.to} value={false} userbalance={this.state.balance}>Log in</Link></Button>
+                        <Link to={this.state.to} value={false} >Log in</Link></Button>
                 </Form>
             </div>
         )
     }
 }
-
-export default Login
+const mapStateToProps = state => ({ applicationState: state });
+const mapDispatchToProps = dispatch => ({ actions: bindActionCreators(actions, dispatch) });
+export default connect(mapStateToProps, mapDispatchToProps)(Login);
