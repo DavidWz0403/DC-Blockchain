@@ -36,5 +36,21 @@ router.route('/add').post(async (req, res) => {
     }
 })
 
+router.route('/update/:id').post((req, res) => {
+    Block.findById(req.params.id)
+        .then(block => {
+            block.id = req.body.id;
+            block.hash = req.body.hash;
+            block.previousHash = req.body.previousHash;
+            block.nonce = req.body.nonce;
+            block.timestamp = req.body.timestamp;
+            block.transactions = Array(req.body.transactions);
 
+
+            block.save()
+                .then(() => res.json(block))
+                .catch(err => res.status(400).json('Error: ' + err));
+        })
+        .catch(err => res.status(400).json('Error: ' + err));
+});
 module.exports = router; 

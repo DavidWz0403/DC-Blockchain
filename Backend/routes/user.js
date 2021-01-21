@@ -15,13 +15,13 @@ router.route('/add').post(async (req, res) => {
     const publicKey = req.body.publicKey;
     const privateKey = req.body.privateKey;
     const balance = Number(req.body.balance);
-    const transactions = Array(req.body.transactions)
+
 
     const newUser = new User({
         publicKey,
         privateKey,
-        balance,
-        transactions
+        balance
+
     });
 
     try {
@@ -31,6 +31,12 @@ router.route('/add').post(async (req, res) => {
         res.json('Error: ' + err);
     }
 })
+
+router.route('/:id').get((req, res) => {
+    User.findById(req.params.id)
+        .then(user => res.json(user))
+        .catch(err => res.status(400).json('Error: ' + err));
+});
 
 
 module.exports = router; 

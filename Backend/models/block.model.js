@@ -16,7 +16,7 @@ const BlockSchema = new Schema({
     previousHash: { type: String, required: true },
     nonce: { type: Number, required: true },
     timestamp: { type: Date, required: true },
-    transactions: [TransactionSchema],
+    transactions: [],
 })
 
 
