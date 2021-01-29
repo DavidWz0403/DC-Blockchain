@@ -6,6 +6,7 @@ import Transaction from './transaction_class';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as actions from '../actions/app.action';
+import axios from 'axios';
 
 class Account extends Component {
     constructor(props) {
@@ -16,13 +17,18 @@ class Account extends Component {
             amount: 0,
             fromAddressInput: "",//should be fetched from API
             variant: "success",
-            transactions: [],
             hash: "",
             timestamp: "",
             showSuccess: false,
-            text: ""
+            text: "",
+            transaction: {
+                toAddress: "",
+                fromAdress: this.props.applicationState.user.publicKey,
+                amount: 0
+            },
+            transactions: []
         }
-        this.transaction = Transaction;
+
     }
 
     componentDidMount = async () => {
@@ -30,46 +36,64 @@ class Account extends Component {
     }
 
     setAddressInput = (e) => {
-        const toAddress = e.target.value;
+        const transaction = { ...this.state.transaction }
+        transaction.toAddress = e.target.value;
         this.setState({
-            toAddressInput: toAddress
+            transaction
         })
     }
 
-    setFromAddressInput = (e) => {
-        const fromAddress = e.target.value;
-        this.setState({
-            fromAddressInput: fromAddress
-        })
-    }
     setAmountInput = (e) => {
-        const amountInput = e.target.value;
+        const transaction = { ...this.state.transaction }
+        transaction.amount = e.target.value;
         this.setState({
-            amount: amountInput
+            transaction
         })
     }
-    calculateHash = () => {
-        const SHA256 = require('crypto-js/sha256');
-        return SHA256(this.state.fromAddressInput + this.state.toAddressInput +
-            this.state.amount).toString();
+
+    setTransactionState = () => {
+        this.setState({
+            transactions: [...this.state.transactions, this.state.transaction]
+        }, () => {
+            console.log(this.state.transactions)
+        })
     }
+
 
     signTransaction = async () => {
 
-        //validation process with API Call if the wallet address is in our database
-        const newBalance = this.state.balance
-        let transaction;
-        transaction = new Transaction(this.state.fromAddressInput,
-            this.state.toAddressInput, this.state.amount, this.calculateHash(),
-            this.state.timestamp = Date.now()
-        );
-        const newtrans = [...this.state.transactions, transaction];
-        this.setState({
-            balance: newBalance - this.state.amount,
-            transactions: newtrans
-        }, function () {
-            console.log(this.state.transactions);
-        })
+        this.setTransactionState();
+        try {
+            const response = await axios.get('http://localhost:4000/blocks');
+            const blocks = response.data
+            var latestBlock = blocks.reduce(function (prev, current) {
+                if (+current.id > +prev.id) {
+                    return current;
+                } else {
+                    return prev;
+                }
+            });
+            const block = {
+                id: latestBlock.id,
+                hash: latestBlock.hash,
+                previousHash: latestBlock.previousHash,
+                nonce: latestBlock.nonce,
+                timestamp: latestBlock.timestamp,
+                transactions: this.state.transactions
+            }
+            console.log(block);
+            const transres = await axios.post(`http://localhost:4000/blocks/update/${latestBlock._id}`, block);
+            console.log(transres.data);
+            console.log(latestBlock._id);
+
+        }
+        catch (err) {
+            console.log('Error: ' + err)
+        }
+
+
+        // })
+
 
     }
 
@@ -87,7 +111,7 @@ class Account extends Component {
                 <Form>
                     <Form.Group controlId="email">
                         <Form.Label>From address:<span>*</span></Form.Label>
-                        <Form.Control placeholder={this.props.applicationState.user.publicKey} value={this.state.fromAddressInput}
+                        <Form.Control placeholder={this.props.applicationState.user.publicKey} value={this.props.applicationState.user.publicKey}
                             onChange={this.setFromAddressInput} type="text" required />
                         <Form.Text className="text-muted">
                             Thos is your wallet address <strong>You cannot change it, because you can only spend your own coins</strong>
@@ -95,14 +119,14 @@ class Account extends Component {
                     </Form.Group>
                     <Form.Group controlId="textarea">
                         <Form.Label>To address<span>*</span></Form.Label>
-                        <Form.Control value={this.state.toAddressInput} onChange={this.setAddressInput} required />
+                        <Form.Control value={this.state.transaction.toAddress} onChange={this.setAddressInput} required />
                         <Form.Text className="text-muted">
                             The wallet address where you want to send the money to, <strong>enter only valid addresses!</strong>
                         </Form.Text>
                     </Form.Group>
                     <Form.Group controlId="textarea">
                         <Form.Label>Amount<span>*</span></Form.Label>
-                        <Form.Control value={this.state.amount} onChange={this.setAmountInput} required />
+                        <Form.Control value={this.state.transaction.amount} onChange={this.setAmountInput} required />
                         <Form.Text className="text-muted">
                             Amount of money, you would like to send!
                         </Form.Text>

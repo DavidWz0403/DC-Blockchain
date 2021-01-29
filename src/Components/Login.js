@@ -20,7 +20,7 @@ class Login extends Component {
             variant: "success",
             text: '',
             value: false,
-            to: "/account",
+            to: false,
             id: "",
             balance: 0
         }
@@ -54,10 +54,10 @@ class Login extends Component {
                     user.privateKey === this.state.privInput) {
                     const currentUser = user;
                     this.props.actions.storeUserData(currentUser)
-
+                    this.props.history.push("/account")
                     this.setState({
                         value: true,
-                        to: `/account`,
+
 
                     })
 
