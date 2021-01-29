@@ -44,7 +44,7 @@ router.route('/update/:id').post((req, res) => {
             block.previousHash = req.body.previousHash;
             block.nonce = req.body.nonce;
             block.timestamp = req.body.timestamp;
-            block.transactions = Array(req.body.transactions);
+            block.transactions = req.body.transactions;
 
 
             block.save()
