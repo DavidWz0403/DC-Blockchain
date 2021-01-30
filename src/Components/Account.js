@@ -8,6 +8,8 @@ import { bindActionCreators } from 'redux';
 import * as actions from '../actions/app.action';
 import axios from 'axios';
 
+
+
 class Account extends Component {
     constructor(props) {
         super(props)
@@ -32,7 +34,29 @@ class Account extends Component {
     }
 
     componentDidMount = async () => {
+        try {
+            const response = await axios.get('http://localhost:4000/blocks');
+            const blocks = response.data
+            var latestBlock = blocks.reduce(function (prev, current) {
+                if (+current.id > +prev.id) {
+                    return current;
+                } else {
+                    return prev;
+                }
+            });
+            console.log(latestBlock);
+            this.props.actions.storeLatestBlockData(latestBlock);
+            this.setState({
+                transactions: this.props.applicationState.block.transactions
+            }, () => {
+                console.log(this.state.transactions)
+            })
 
+
+
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     setAddressInput = (e) => {
@@ -63,28 +87,20 @@ class Account extends Component {
     signTransaction = async () => {
 
         this.setTransactionState();
+
         try {
-            const response = await axios.get('http://localhost:4000/blocks');
-            const blocks = response.data
-            var latestBlock = blocks.reduce(function (prev, current) {
-                if (+current.id > +prev.id) {
-                    return current;
-                } else {
-                    return prev;
-                }
-            });
             const block = {
-                id: latestBlock.id,
-                hash: latestBlock.hash,
-                previousHash: latestBlock.previousHash,
-                nonce: latestBlock.nonce,
-                timestamp: latestBlock.timestamp,
+                id: this.props.applicationState.block.id,
+                hash: this.props.applicationState.block.hash,
+                previousHash: this.props.applicationState.block.previousHash,
+                nonce: this.props.applicationState.block.nonce,
+                timestamp: this.props.applicationState.block.timestamp,
                 transactions: this.state.transactions
             }
             console.log(block);
-            const transres = await axios.post(`http://localhost:4000/blocks/update/${latestBlock._id}`, block);
+            const transres = await axios.post(`http://localhost:4000/blocks/update/${this.props.applicationState.block._id}`, block);
             console.log(transres.data);
-            console.log(latestBlock._id);
+
 
         }
         catch (err) {

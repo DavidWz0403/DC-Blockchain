@@ -1,8 +1,9 @@
-import { STORE_USER_DATA } from '../actions/app.action';
+import { STORE_USER_DATA, STORE_LATESTBLOCK_DATA } from '../actions/app.action';
 
 const initialState = {
     user: false,
-    loggedIn: false
+    loggedIn: false,
+    block: false
 };
 
 function appReducer(state = initialState, action) {
@@ -15,6 +16,12 @@ function appReducer(state = initialState, action) {
                 user: action.user,
                 loggedIn: !!action.user
             };
+
+        case STORE_LATESTBLOCK_DATA:
+            return {
+                ...state,
+                block: action.block
+            }
     }
 
     return {
